@@ -12,63 +12,46 @@
     }
 
     .print-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start; /* Align cards to the start */
-        align-items: flex-start; /* Align cards to the top */
-        gap: 0; /* Remove space between cards */
+        display: flex; /* Arrange cards in a row */
+        flex-wrap: wrap; /* Allow wrapping */
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 0; /* Remove gap between cards */
+        padding: 0; /* Remove container padding */
         width: 100%;
     }
 
-    /* Use the existing card styles from card_style.css, but make adjustments */
+    /* Let card styles from card_style.css apply, only add print-specific behavior */
     .card-template {
-        border: none; /* Remove border */
-        box-shadow: none; /* Remove editor shadow */
-        margin: 0; /* Remove card margin */
-        width: 33.333%; /* Aim for 3 cards per row exactly */
-        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        /* Set width for 3 columns */
+        width: 33.333%;
+        box-sizing: border-box; /* Width includes border/padding */
+
+        /* Remove card margin specifically for print */
+        margin: 0 !important;
+
+        /* Scale down the card content using zoom to fit the 33.333% width */
+        /* This scales the rendering without affecting layout box, preventing gaps */
+        zoom: 0.85; /* Adjust zoom factor as needed (e.g., 85%) */
+
         page-break-inside: avoid; /* Try to prevent cards from breaking across pages */
-        /* transform: scale(0.9); */ /* Remove scaling */
-        transform-origin: top left;
-    }
 
-    /* Ensure images are constrained and print */
-    .card-image-container img {
-        max-width: 100%;
-        height: auto;
-        display: block; /* Remove extra space below image */
-        -webkit-print-color-adjust: exact; /* Force background images/colors printing in Chrome/Safari */
-        color-adjust: exact; /* Standard property */
-    }
-
-    /* Ensure background colors/images print */
-    .card-header, .card-stats, .card-costs, .cost-icon, .star.filled {
+        /* Ensure colors/backgrounds print */
         -webkit-print-color-adjust: exact;
         color-adjust: exact;
     }
 
-    /* Hide elements not needed for print (redundant if JS removes them, but good practice) */
+    /* Ensure all elements within the card print colors/backgrounds */
+    .card-template * {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    /* Hide elements not needed for print */
     .card-select-checkbox,
     .remove-card-btn {
         display: none !important;
     }
 }
 
-/* Styles for screen view of the print window (optional, but can be helpful) */
-body {
-    font-family: sans-serif;
-}
-.print-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0; /* Remove gap for screen preview */
-    padding: 0; /* Remove padding for screen preview */
-}
-.card-template {
-    border: none; /* Remove border for screen preview */
-    margin: 0; /* Remove margin for screen preview */
-    width: 33.333%; /* Adjust width for screen preview */
-    box-sizing: border-box;
-    /* transform: scale(0.9); */ /* Remove scaling for screen preview */
-    transform-origin: top left;
-}
+/* Screen styles removed as they are no longer needed */
