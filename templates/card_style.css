@@ -53,9 +53,13 @@
 .card-image-container {
     background-color: #4a6a8a; /* Medium blue background for image */
     padding: 20px;
-    text-align: center;
+    /* text-align: center; */ /* Replaced by flexbox centering */
     position: relative;
     z-index: 1;
+    /* min-height: 150px; */ /* REMOVED: Let content dictate height */
+    display: flex; /* Added: Use flexbox for centering */
+    justify-content: center; /* Added: Center horizontally */
+    align-items: center; /* Added: Center vertically */
 }
 
 .card-image {
@@ -72,6 +76,7 @@
     z-index: 1;
     border-top: 2px solid #1a1a1a; /* Separator line */
     border-bottom: 2px solid #1a1a1a; /* Separator line */
+    /* min-height: 110px; */ /* REMOVED: Let content dictate height */
 }
 
 .stat-row {
@@ -113,7 +118,8 @@
     align-items: center;
     position: relative;
     z-index: 1;
-    min-height: 60px; /* Ensure space even if empty */
+    /* min-height: 75px; */ /* REMOVED: Let content dictate height */
+    padding: 15px 10px; /* Ensure padding is still present */
 }
 
 .cost-item {
@@ -164,4 +170,28 @@
     font-size: inherit;
     font-family: inherit;
     width: 80%; /* Adjust as needed */
+}
+/* Remove Button Styling */
+.remove-card-btn {
+    position: absolute;
+    top: 12px; /* Adjust positioning relative to inner border */
+    right: 12px; /* Adjust positioning relative to inner border */
+    background-color: #e74c3c; /* Red */
+    color: white;
+    border: 1px solid #c0392b;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 20px; /* Center the 'X' */
+    text-align: center;
+    cursor: pointer;
+    z-index: 10; /* Ensure it's above other elements */
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.remove-card-btn:hover {
+    background-color: #c0392b; /* Darker red on hover */
 }

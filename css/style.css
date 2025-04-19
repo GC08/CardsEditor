@@ -40,3 +40,18 @@ h1 {
 }
 
 /* Add other general page styles as needed */
+#save-changes-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #3498db; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 10px; /* Add some space next to the Add button */
+}
+
+#save-changes-btn:hover {
+    background-color: #2980b9;
+}

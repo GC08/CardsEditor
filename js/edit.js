@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cardContainer = document.getElementById('card-container');
     const addCardBtn = document.getElementById('add-card-btn');
+    const saveChangesBtn = document.getElementById('save-changes-btn'); // Get save button
     let cardTemplateString = '';
     let cardsData = {}; // Will hold the parsed JSON { cards: { ... } }
 
     // --- Initialization ---
     async function init() {
         try {
+            // Stop any previous server first if needed (handled by user/script)
             const [templateResponse, dataResponse] = await Promise.all([
                 fetch('templates/card.html'),
                 fetch('cards.json')
@@ -23,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 cardsData = { cards: {} }; // Initialize safely
             }
 
-
             renderAllCards();
             addEventListeners();
 
@@ -37,21 +38,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAllCards() {
         cardContainer.innerHTML = ''; // Clear existing cards
         if (cardsData && cardsData.cards) {
-            for (const cardName in cardsData.cards) {
-                renderCard(cardName, cardsData.cards[cardName]);
-            }
+            // Sort card names alphabetically for consistent order
+            const sortedCardNames = Object.keys(cardsData.cards).sort();
+            sortedCardNames.forEach(cardName => {
+                 renderCard(cardName, cardsData.cards[cardName]);
+            });
         } else {
              console.warn("No cards found in data to render.");
         }
+        adjustCardHeights(); // Adjust heights after rendering
     }
 
     function renderCard(name, details) {
         let cardHtml = cardTemplateString;
 
         // Basic replacements
-        cardHtml = cardHtml.replace(/{{NAME}}/g, name); // Replace all instances of name
-        cardHtml = cardHtml.replace('{{YEAR}}', details.year || 'N/A');
-        cardHtml = cardHtml.replace('{{IMAGE_SRC}}', `card_images/${name}.png`); // Assumes PNG format
+        cardHtml = cardHtml.replace(/{{NAME}}/g, escapeHtml(name)); // Replace all instances of name, escape HTML
+        cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
+        // Construct image path safely
+        const imagePath = `card_images/${encodeURIComponent(name)}.png`;
+        cardHtml = cardHtml.replace('{{IMAGE_SRC}}', imagePath);
 
         // Stats - Stars
         cardHtml = cardHtml.replace('{{SPEED_STARS}}', generateStarsHTML('speed', details.speed || 0));
@@ -66,17 +72,25 @@ document.addEventListener('DOMContentLoaded', () => {
         cardHtml = cardHtml.replace('{{TOOLS_COST}}', details.tools || 0);
 
         // Create element and append
-        const cardElement = document.createElement('div');
-        cardElement.innerHTML = cardHtml; // Use innerHTML on a temporary div
-        const actualCard = cardElement.firstElementChild; // Get the actual .card-template div
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cardHtml.trim(); // Use innerHTML on a temporary div
+        const actualCard = tempDiv.firstElementChild; // Get the actual .card-template div
+
         if(actualCard) {
              // Set data attribute for easier identification in event handlers
-            actualCard.dataset.cardName = name;
+            actualCard.dataset.cardName = name; // Store original name for lookups
+
+            // Add error handling for images (REMOVED - User preference)
+            const img = actualCard.querySelector('.card-image');
+            // if (img) {
+            //     img.onerror = () => { ... }; // Removed error handling block
+            //     img.onload = () => {}; // Removed onload handling block
+            // }
+
             cardContainer.appendChild(actualCard);
         } else {
             console.error("Could not create card element from template for:", name);
         }
-
     }
 
     function generateStarsHTML(statName, rating) {
@@ -91,23 +105,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners ---
     function addEventListeners() {
         addCardBtn.addEventListener('click', handleAddCardClick);
+        saveChangesBtn.addEventListener('click', handleSaveChangesClick); // Listener for save button
         cardContainer.addEventListener('click', handleCardContainerClick);
+        cardContainer.addEventListener('contextmenu', handleCardContainerRightClick); // Listener for right-clicks (for decrement)
+        cardContainer.addEventListener('dblclick', handleCardContainerDoubleClick); // Use double-click for editing text
     }
 
     // --- Event Handlers ---
+    function handleSaveChangesClick() {
+        console.log("Current Card Data (In Memory):");
+        console.log(JSON.stringify(cardsData, null, 2)); // Pretty print the JSON
+        alert("Current card data logged to the browser console. Saving to file is not implemented.");
+        // In a real application, you would send this data to a server or offer a download.
+    }
+
     function handleAddCardClick() {
-        const newCardName = prompt("Enter the name for the new card:");
+        const newCardName = prompt("Enter the name for the new card (will also be image filename):");
         if (!newCardName || newCardName.trim() === "") {
             alert("Card name cannot be empty.");
             return;
         }
-        if (cardsData.cards[newCardName]) {
-            alert(`Card with name "${newCardName}" already exists.`);
+        const trimmedName = newCardName.trim();
+        if (cardsData.cards[trimmedName]) {
+            alert(`Card with name "${trimmedName}" already exists.`);
             return;
         }
 
         // Add default card data
-        cardsData.cards[newCardName] = {
+        cardsData.cards[trimmedName] = {
             year: "YYYY", // Default year
             speed: 3,
             acceleration: 3,
@@ -119,18 +144,19 @@ document.addEventListener('DOMContentLoaded', () => {
             tools: 1
         };
 
-        // Render the new card
-        renderCard(newCardName, cardsData.cards[newCardName]);
+        // Render the new card and adjust heights
+        renderCard(trimmedName, cardsData.cards[trimmedName]);
+        adjustCardHeights();
         // Note: Changes are only in memory, not saved to file.
     }
 
     function handleCardContainerClick(event) {
         const target = event.target;
         const cardElement = target.closest('.card-template');
-        if (!cardElement) return; // Click wasn't inside a card
+        if (!cardElement) return;
 
         const cardName = cardElement.dataset.cardName;
-        if (!cardName || !cardsData.cards[cardName]) return; // Card data not found
+        if (!cardName || !cardsData.cards[cardName]) return;
 
         // Handle Star Clicks
         if (target.classList.contains('star') && target.parentElement.classList.contains('stars')) {
@@ -140,13 +166,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (statName && !isNaN(newValue)) {
                 cardsData.cards[cardName][statName] = newValue;
-                // Re-render stars for this stat
                 statGroup.innerHTML = generateStarsHTML(statName, newValue);
-                 // Note: Changes are only in memory
             }
         }
 
-        // Handle Cost Clicks (Simple Increment)
+        // Handle Remove Button Click
+        if (target.classList.contains('remove-card-btn')) {
+            if (confirm(`Are you sure you want to remove the card "${cardName}"? This action is only in memory.`)) {
+                delete cardsData.cards[cardName]; // Remove from in-memory data
+                cardElement.remove(); // Remove from DOM
+                adjustCardHeights(); // Re-adjust heights
+            }
+        }
+
+        // Handle Cost Clicks (Left-click = Increment)
         const costItem = target.closest('.cost-item');
          if (costItem && (target.classList.contains('cost-icon') || target.classList.contains('cost-value'))) {
             const costName = costItem.dataset.cost;
@@ -154,74 +187,164 @@ document.addEventListener('DOMContentLoaded', () => {
                 let currentValue = parseInt(cardsData.cards[cardName][costName] || 0, 10);
                 currentValue++; // Simple increment
                 cardsData.cards[cardName][costName] = currentValue;
-                // Update displayed value
                 const valueSpan = costItem.querySelector('.cost-value');
-                if (valueSpan) {
-                    valueSpan.textContent = currentValue;
-                }
-                 // Note: Changes are only in memory
+                if (valueSpan) valueSpan.textContent = currentValue;
             }
         }
-
-        // TODO: Add handlers for editing name/year if needed
-        // Example: Make name editable
-        // if (target.classList.contains('card-name')) {
-        //     makeEditable(target, cardName, 'name');
-        // }
-        // if (target.classList.contains('card-year')) {
-        //     makeEditable(target, cardName, 'year');
-        // }
     }
 
-    // --- Helper for making text editable (Example - needs refinement) ---
-    /*
+     function handleCardContainerRightClick(event) {
+        const target = event.target;
+        const costItem = target.closest('.cost-item');
+
+        // Handle Cost Right-Clicks (Decrement)
+         if (costItem && (target.classList.contains('cost-icon') || target.classList.contains('cost-value'))) {
+            event.preventDefault(); // Prevent browser context menu
+            const cardElement = target.closest('.card-template');
+            if (!cardElement) return;
+            const cardName = cardElement.dataset.cardName;
+            if (!cardName || !cardsData.cards[cardName]) return;
+
+            const costName = costItem.dataset.cost;
+            if (costName) {
+                let currentValue = parseInt(cardsData.cards[cardName][costName] || 0, 10);
+                currentValue = Math.max(0, currentValue - 1); // Decrement, minimum 0
+                cardsData.cards[cardName][costName] = currentValue;
+                const valueSpan = costItem.querySelector('.cost-value');
+                if (valueSpan) valueSpan.textContent = currentValue;
+            }
+        }
+    }
+
+    function handleCardContainerDoubleClick(event) {
+        const target = event.target;
+        const cardElement = target.closest('.card-template');
+        if (!cardElement) return;
+        const cardName = cardElement.dataset.cardName;
+
+        // Handle Name/Year Double Click for Editing
+        if (target.classList.contains('card-name')) {
+            makeEditable(target, cardName, 'name');
+        } else if (target.classList.contains('card-year')) {
+             makeEditable(target, cardName, 'year');
+        }
+    }
+
+
+    // --- Helper for making text editable ---
     function makeEditable(element, cardName, propertyName) {
-        const currentValue = element.textContent;
+        // Prevent making editable if already editing
+        if (element.querySelector('input.editable-input')) return;
+
+        const originalValue = element.textContent;
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = currentValue;
+        input.value = originalValue;
         input.className = 'editable-input'; // Add class for styling
+        input.style.width = '90%'; // Adjust width as needed
 
-        element.replaceWith(input);
+        // Clear the element and append the input
+        element.textContent = '';
+        element.appendChild(input);
         input.focus();
+        input.select(); // Select text for easy replacement
 
-        input.addEventListener('blur', () => {
+        const saveChanges = () => {
             const newValue = input.value.trim();
-            // !! IMPORTANT: Changing the 'name' property here is complex
-            // because it's the key in our cardsData.cards object.
-            // For now, just update the display or handle year only.
-            if (propertyName === 'year') {
-                 cardsData.cards[cardName][propertyName] = newValue;
-                 const newElement = document.createElement(element.tagName.toLowerCase());
-                 newElement.className = element.className;
-                 newElement.textContent = newValue;
-                 input.replaceWith(newElement);
-            } else {
-                 // Revert if not saving (or handle name change complexity)
-                 const originalElement = document.createElement(element.tagName.toLowerCase());
-                 originalElement.className = element.className;
-                 originalElement.textContent = currentValue; // Revert
-                 input.replaceWith(originalElement);
-                 alert("Name editing not fully implemented yet due to key constraints.");
-            }
+            // Restore original element structure
+            element.textContent = newValue || originalValue; // Use new value or revert if empty
 
-        });
+            if (newValue && newValue !== originalValue) {
+                 if (propertyName === 'year') {
+                    cardsData.cards[cardName][propertyName] = newValue;
+                    console.log(`Updated year for ${cardName} to ${newValue}`);
+                 } else if (propertyName === 'name') {
+                    // ** IMPORTANT: Renaming the card is complex **
+                    // It's the key in cardsData and affects the image filename.
+                    // For now, we only update the display text, not the underlying data key or image.
+                    // A full rename would require deleting the old key, adding a new one,
+                    // and potentially handling image renaming/relinking.
+                    console.warn(`Card name display updated to "${newValue}", but the underlying data key "${cardName}" and image link were NOT changed.`);
+                    alert(`Name display updated to "${newValue}".\nFull rename (including data key and image) is not implemented.`);
+                    element.textContent = newValue; // Update display only
+                 }
+            } else {
+                 element.textContent = originalValue; // Revert if no change or empty
+            }
+        };
+
+        input.addEventListener('blur', saveChanges);
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                input.blur(); // Trigger the blur event to save/revert
+                input.blur(); // Trigger save
             } else if (e.key === 'Escape') {
-                 // Revert without saving
-                 const originalElement = document.createElement(element.tagName.toLowerCase());
-                 originalElement.className = element.className;
-                 originalElement.textContent = currentValue;
-                 input.replaceWith(originalElement);
+                 element.textContent = originalValue; // Revert
+                 input.removeEventListener('blur', saveChanges); // Prevent blur save on escape
+                 input.blur(); // Lose focus
             }
         });
     }
-    */
+
+    // --- Height Adjustment ---
+    function adjustCardHeights() {
+        // Reset heights first to recalculate based on content
+        const cards = cardContainer.querySelectorAll('.card-template');
+        cards.forEach(card => {
+            const imgContainer = card.querySelector('.card-image-container');
+            const stats = card.querySelector('.card-stats');
+            const costs = card.querySelector('.card-costs');
+            if(imgContainer) imgContainer.style.minHeight = ''; // Reset minHeight
+            if(stats) stats.style.minHeight = ''; // Reset minHeight
+            if(costs) costs.style.minHeight = ''; // Reset minHeight
+        });
+
+        // Allow browser to reflow
+        requestAnimationFrame(() => {
+            // Find max heights for each section across all visible cards
+            let maxImgHeight = 0;
+            let maxStatsHeight = 0;
+            let maxCostsHeight = 0;
+
+            cards.forEach(card => {
+                const imgContainer = card.querySelector('.card-image-container');
+                const stats = card.querySelector('.card-stats');
+                const costs = card.querySelector('.card-costs');
+                if(imgContainer) maxImgHeight = Math.max(maxImgHeight, imgContainer.offsetHeight);
+                if(stats) maxStatsHeight = Math.max(maxStatsHeight, stats.offsetHeight);
+                if(costs) maxCostsHeight = Math.max(maxCostsHeight, costs.offsetHeight);
+            });
+
+             // Apply max heights to all cards
+            cards.forEach(card => {
+                const imgContainer = card.querySelector('.card-image-container');
+                const stats = card.querySelector('.card-stats');
+                const costs = card.querySelector('.card-costs');
+                 // Set min-height instead of height to allow content to grow if needed,
+                 // but ensure consistent alignment.
+                // if(imgContainer) imgContainer.style.minHeight = `${maxImgHeight}px`; // REMOVED JS height setting for image
+                // if(stats) stats.style.minHeight = `${maxStatsHeight}px`; // REMOVED JS height setting for stats
+                // if(costs) costs.style.minHeight = `${maxCostsHeight}px`; // REMOVED JS height setting for costs
+            });
+        });
+    }
+
+    // --- Utility ---
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return unsafe;
+        // Corrected replacements
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
 
 
     // --- Start the application ---
     init();
+
+    // Adjust heights on window resize as well
+    // window.addEventListener('resize', adjustCardHeights); // (Temporarily disabled for debugging)
 });
