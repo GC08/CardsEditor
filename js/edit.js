@@ -208,9 +208,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const valueSpan = costItem.querySelector('.cost-value');
                 if (valueSpan) valueSpan.textContent = currentValue;
             }
+    
+        } // End of costItem check
+    
+        // Handle Year Click for Editing (Moved outside costItem check)
+        if (target.classList.contains('card-year')) {
+            makeEditable(target, cardName, 'year');
         }
-    }
-
+    } // End of handleCardContainerClick
+    
      function handleCardContainerRightClick(event) {
         const target = event.target;
         const costItem = target.closest('.cost-item');
@@ -243,9 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle Name/Year Double Click for Editing
         if (target.classList.contains('card-name')) {
             makeEditable(target, cardName, 'name');
-        } else if (target.classList.contains('card-year')) {
-             makeEditable(target, cardName, 'year');
         }
+        // Year editing moved to single click handler
     }
 
 

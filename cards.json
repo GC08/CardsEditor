@@ -1,15 +1,37 @@
 {
-  "cards": {
-    "AC COBRA 289": {
-      "year": "1963",
-      "speed": 4,
-      "acceleration": 4,
-      "handling": 3,
-      "money": 1,
-      "gas": 1,
-      "tires": 1,
-      "parts": 1,
-      "tools": 1
+    "cards": {
+        "AC COBRA 289": {
+            "year": "1963",
+            "speed": 4,
+            "acceleration": 4,
+            "handling": 3,
+            "money": 1,
+            "gas": 1,
+            "tires": 1,
+            "parts": 0,
+            "tools": 1
+        },
+        "TEST": {
+            "year": "1993",
+            "speed": 5,
+            "acceleration": 3,
+            "handling": 3,
+            "money": 1,
+            "gas": 0,
+            "tires": 3,
+            "parts": 1,
+            "tools": 1
+        },
+        "TEST2": {
+            "year": "1997",
+            "speed": 3,
+            "acceleration": 2,
+            "handling": 5,
+            "money": 1,
+            "gas": 2,
+            "tires": 1,
+            "parts": 3,
+            "tools": 1
+        }
     }
-  }
 }
