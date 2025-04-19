@@ -1,7 +1,7 @@
 @media print {
     @page {
         size: A4; /* Specify A4 paper size */
-        margin: 1cm; /* Add some margin */
+        margin: 0; /* Remove page margins */
     }
 
     body {
@@ -16,19 +16,19 @@
         flex-wrap: wrap;
         justify-content: flex-start; /* Align cards to the start */
         align-items: flex-start; /* Align cards to the top */
-        gap: 10px; /* Add some space between cards */
+        gap: 0; /* Remove space between cards */
         width: 100%;
     }
 
     /* Use the existing card styles from card_style.css, but make adjustments */
     .card-template {
-        border: 1px solid #ccc; /* Add a light border for separation */
+        border: none; /* Remove border */
         box-shadow: none; /* Remove editor shadow */
-        margin: 5px; /* Add small margin around each card */
-        width: calc(33.333% - 20px); /* Aim for 3 cards per row, adjust calc for margins/gap */
+        margin: 0; /* Remove card margin */
+        width: 33.333%; /* Aim for 3 cards per row exactly */
         box-sizing: border-box; /* Include padding and border in the element's total width and height */
         page-break-inside: avoid; /* Try to prevent cards from breaking across pages */
-        transform: scale(0.9); /* Slightly scale down cards to fit better */
+        /* transform: scale(0.9); */ /* Remove scaling */
         transform-origin: top left;
     }
 
@@ -61,14 +61,14 @@ body {
 .print-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
+    gap: 0; /* Remove gap for screen preview */
+    padding: 0; /* Remove padding for screen preview */
 }
 .card-template {
-    border: 1px solid #ccc;
-    margin: 5px;
-    width: calc(33.333% - 20px);
+    border: none; /* Remove border for screen preview */
+    margin: 0; /* Remove margin for screen preview */
+    width: 33.333%; /* Adjust width for screen preview */
     box-sizing: border-box;
-    transform: scale(0.9);
+    /* transform: scale(0.9); */ /* Remove scaling for screen preview */
     transform-origin: top left;
 }

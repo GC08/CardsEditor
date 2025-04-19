@@ -10,7 +10,10 @@ This project provides a web-based editor for creating and modifying car stat car
 *   Allows removing cards (data removed from browser memory only).
 *   Supports editing stats (Speed, Acceleration, Handling) by clicking stars.
 *   Supports editing costs (Money, Gas, Tires, Parts, Tools) by left-clicking (increment) or right-clicking (decrement).
-*   Supports editing Year and Name by double-clicking (Name edit is display-only).
+*   Supports editing Year by clicking on it.
+*   Supports editing Name by double-clicking (Name edit is display-only).
+*   Allows selecting cards via checkboxes for printing.
+*   "Print Selected" button opens a new window with selected cards formatted for printing (A4, no margins).
 *   "Save Changes" button logs the current in-memory card data to the browser console.
 
 ## Setup and Running
@@ -32,6 +35,7 @@ This project provides a web-based editor for creating and modifying car stat car
 *   `cards.json`: Contains the data for the car cards.
 *   `card_images/`: Directory to store card images (e.g., `AC COBRA 289.png`). Image filenames must match the card name in `cards.json`.
 *   `css/style.css`: Styles for the main `edit.html` page.
+*   `css/print.css`: Styles specifically for the print view.
 *   `js/edit.js`: JavaScript logic for loading data, rendering cards, and handling interactions.
 *   `templates/card.html`: HTML template for a single card.
 *   `templates/card_style.css`: CSS styles specifically for the card template.
