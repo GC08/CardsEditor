@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardContainer = document.getElementById('card-container');
     const addCardBtn = document.getElementById('add-card-btn');
     const saveChangesBtn = document.getElementById('save-changes-btn'); // Get save button
+    const printSelectedBtn = document.getElementById('print-selected-btn'); // Get print button
     let cardTemplateString = '';
     let cardsData = {}; // Will hold the parsed JSON { cards: { ... } }
 
@@ -49,13 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         adjustCardHeights(); // Adjust heights after rendering
     }
 
-    function renderCard(name, details) {
+    // --- Helper to generate HTML string for a single card ---
+    function getCardHtml(name, details) {
         let cardHtml = cardTemplateString;
 
         // Basic replacements
         cardHtml = cardHtml.replace(/{{NAME}}/g, escapeHtml(name)); // Replace all instances of name, escape HTML
         cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
-        // Construct image path safely
+        // Construct image path safely - Use absolute path for print view if needed, but relative should work if print.html is at root
         const imagePath = `card_images/${encodeURIComponent(name)}.png`;
         cardHtml = cardHtml.replace('{{IMAGE_SRC}}', imagePath);
 
@@ -71,27 +73,31 @@ document.addEventListener('DOMContentLoaded', () => {
         cardHtml = cardHtml.replace('{{PARTS_COST}}', details.parts || 0);
         cardHtml = cardHtml.replace('{{TOOLS_COST}}', details.tools || 0);
 
+        return cardHtml.trim();
+    }
+
+    // --- Renders a card and appends it to the main container ---
+    function renderCard(name, details) {
+        const cardHtmlString = getCardHtml(name, details);
+        if (!cardHtmlString) {
+             console.error("Could not generate card HTML string for:", name);
+             return;
+        }
+
         // Create element and append
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = cardHtml.trim(); // Use innerHTML on a temporary div
+        tempDiv.innerHTML = cardHtmlString;
         const actualCard = tempDiv.firstElementChild; // Get the actual .card-template div
 
         if(actualCard) {
              // Set data attribute for easier identification in event handlers
             actualCard.dataset.cardName = name; // Store original name for lookups
-
-            // Add error handling for images (REMOVED - User preference)
-            const img = actualCard.querySelector('.card-image');
-            // if (img) {
-            //     img.onerror = () => { ... }; // Removed error handling block
-            //     img.onload = () => {}; // Removed onload handling block
-            // }
-
             cardContainer.appendChild(actualCard);
         } else {
             console.error("Could not create card element from template for:", name);
         }
     }
+
 
     function generateStarsHTML(statName, rating) {
         let starsHtml = '';
@@ -106,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function addEventListeners() {
         addCardBtn.addEventListener('click', handleAddCardClick);
         saveChangesBtn.addEventListener('click', handleSaveChangesClick); // Listener for save button
+        printSelectedBtn.addEventListener('click', handlePrintSelectedClick); // Listener for print button
         cardContainer.addEventListener('click', handleCardContainerClick);
         cardContainer.addEventListener('contextmenu', handleCardContainerRightClick); // Listener for right-clicks (for decrement)
         cardContainer.addEventListener('dblclick', handleCardContainerDoubleClick); // Use double-click for editing text
@@ -308,6 +315,65 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- Print Handler ---
+    function handlePrintSelectedClick() {
+        const selectedCheckboxes = cardContainer.querySelectorAll('.card-select-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert("Please select at least one card to print.");
+            return;
+        }
+
+        let printHtmlContent = '';
+        selectedCheckboxes.forEach(checkbox => {
+            const cardElement = checkbox.closest('.card-template');
+            const cardName = cardElement.dataset.cardName;
+            if (cardName && cardsData.cards[cardName]) {
+                // Get the HTML for the card, but remove the checkbox and remove button for printing
+                let cardPrintHtml = getCardHtml(cardName, cardsData.cards[cardName]);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardPrintHtml;
+                const checkboxToRemove = tempDiv.querySelector('.card-select-checkbox');
+                const removeBtnToRemove = tempDiv.querySelector('.remove-card-btn');
+                if (checkboxToRemove) checkboxToRemove.remove();
+                if (removeBtnToRemove) removeBtnToRemove.remove();
+                printHtmlContent += tempDiv.innerHTML; // Add the cleaned card HTML
+            }
+        });
+
+        // Create the full HTML for the print window
+        const printWindowHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Print Cards</title>
+                <link rel="stylesheet" href="templates/card_style.css"> <!-- Base card styles -->
+                <link rel="stylesheet" href="css/print.css"> <!-- Print-specific styles -->
+            </head>
+            <body>
+                <div class="print-container">
+                    ${printHtmlContent}
+                </div>
+            </body>
+            </html>
+        `;
+
+        // Open a new window and write the content
+        const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(printWindowHtml);
+        printWindow.document.close();
+
+        // Wait for content to load before printing (important for images/styles)
+        printWindow.onload = () => {
+            printWindow.focus(); // Focus the window before printing
+            printWindow.print();
+            // Optional: Close window after print dialog is closed
+            // printWindow.onafterprint = () => printWindow.close();
+        };
+    }
+
 
     // --- Height Adjustment ---
     function adjustCardHeights() {

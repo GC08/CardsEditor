@@ -1,0 +1,74 @@
+@media print {
+    @page {
+        size: A4; /* Specify A4 paper size */
+        margin: 1cm; /* Add some margin */
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif; /* Ensure consistent font */
+        background-color: #fff; /* Ensure white background for printing */
+    }
+
+    .print-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start; /* Align cards to the start */
+        align-items: flex-start; /* Align cards to the top */
+        gap: 10px; /* Add some space between cards */
+        width: 100%;
+    }
+
+    /* Use the existing card styles from card_style.css, but make adjustments */
+    .card-template {
+        border: 1px solid #ccc; /* Add a light border for separation */
+        box-shadow: none; /* Remove editor shadow */
+        margin: 5px; /* Add small margin around each card */
+        width: calc(33.333% - 20px); /* Aim for 3 cards per row, adjust calc for margins/gap */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        page-break-inside: avoid; /* Try to prevent cards from breaking across pages */
+        transform: scale(0.9); /* Slightly scale down cards to fit better */
+        transform-origin: top left;
+    }
+
+    /* Ensure images are constrained and print */
+    .card-image-container img {
+        max-width: 100%;
+        height: auto;
+        display: block; /* Remove extra space below image */
+        -webkit-print-color-adjust: exact; /* Force background images/colors printing in Chrome/Safari */
+        color-adjust: exact; /* Standard property */
+    }
+
+    /* Ensure background colors/images print */
+    .card-header, .card-stats, .card-costs, .cost-icon, .star.filled {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    /* Hide elements not needed for print (redundant if JS removes them, but good practice) */
+    .card-select-checkbox,
+    .remove-card-btn {
+        display: none !important;
+    }
+}
+
+/* Styles for screen view of the print window (optional, but can be helpful) */
+body {
+    font-family: sans-serif;
+}
+.print-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+.card-template {
+    border: 1px solid #ccc;
+    margin: 5px;
+    width: calc(33.333% - 20px);
+    box-sizing: border-box;
+    transform: scale(0.9);
+    transform-origin: top left;
+}

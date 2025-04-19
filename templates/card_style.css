@@ -195,3 +195,13 @@
 .remove-card-btn:hover {
     background-color: #c0392b; /* Darker red on hover */
 }
+/* Checkbox Styling */
+.card-select-checkbox {
+    position: absolute;
+    top: 12px; /* Align with remove button, adjust as needed */
+    left: 12px; /* Adjust as needed */
+    z-index: 10; /* Ensure it's above the pseudo-element border and clickable */
+    cursor: pointer;
+    width: 18px; /* Optional: Adjust size */
+    height: 18px; /* Optional: Adjust size */
+}
