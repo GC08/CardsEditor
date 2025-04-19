@@ -19,10 +19,7 @@ This project provides a web-based editor for creating and modifying car stat car
 ## Setup and Running
 
 1.  **Prerequisites:** Ensure you have Python 3 and pip installed.
-2.  **Install Dependencies:** Open a command prompt or terminal in the project directory and run:
-    ```bash
-    pip install -r requirements.txt
-    ```
+2.  **Install Dependencies:** Double-click the `install.bat` file. This will automatically install the necessary Python packages listed in `requirements.txt`. Alternatively, you can open a command prompt or terminal in the project directory and run `pip install -r requirements.txt`.
 3.  **Run the Server:** Double-click the `start_server.bat` file (or run `python server.py` in the terminal). This will:
     *   Start the Flask development server.
     *   Automatically open the editor (`edit.html`) in your default web browser at `http://localhost:8000/edit.html` (if using `start_server.bat`). If running manually, navigate to this URL.
@@ -40,6 +37,7 @@ This project provides a web-based editor for creating and modifying car stat car
 *   `templates/card.html`: HTML template for a single card.
 *   `templates/card_style.css`: CSS styles specifically for the card template.
 *   `server.py`: The Flask backend server script.
+*   `install.bat`: Script to easily install Python dependencies.
 *   `start_server.bat`: Script to easily start the Flask server and open the editor.
 *   `requirements.txt`: Lists the Python dependencies required by the server.
 *   `.gitignore`: Specifies intentionally untracked files that Git should ignore.
