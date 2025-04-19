@@ -4,3 +4,5 @@ Thumbs.db
 
 # IDE/Editor Files
 .vscode/
+cards.json
+card_images/
