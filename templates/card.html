@@ -1,0 +1,47 @@
+<div class="card-template" data-card-name="{{NAME}}">
+    <div class="card-header">
+        <span class="card-year">{{YEAR}}</span>
+        <h2 class="card-name">{{NAME}}</h2>
+    </div>
+    <div class="card-image-container">
+        <img src="{{IMAGE_SRC}}" alt="{{NAME}}" class="card-image">
+    </div>
+    <div class="card-stats">
+        <div class="stat-row">
+            <span class="stat-label">SPEED</span>
+            <div class="stars" data-stat="speed">{{SPEED_STARS}}</div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">ACCELERATION</span>
+            <div class="stars" data-stat="acceleration">{{ACCELERATION_STARS}}</div>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">HANDLING</span>
+            <div class="stars" data-stat="handling">{{HANDLING_STARS}}</div>
+        </div>
+    </div>
+    <div class="card-costs">
+        <!-- Placeholder for potential left-side elements if needed -->
+        <div class="cost-item" data-cost="money">
+            <div class="cost-icon money-icon"></div> <!-- Icon via CSS background -->
+            <span class="cost-value">{{MONEY_COST}}</span>
+        </div>
+        <div class="cost-item" data-cost="gas">
+            <div class="cost-icon gas-icon"></div>
+            <span class="cost-value">{{GAS_COST}}</span>
+        </div>
+        <div class="cost-item" data-cost="tires">
+            <div class="cost-icon tires-icon"></div>
+            <span class="cost-value">{{TIRES_COST}}</span>
+        </div>
+        <div class="cost-item" data-cost="parts">
+            <div class="cost-icon parts-icon"></div>
+            <span class="cost-value">{{PARTS_COST}}</span>
+        </div>
+        <div class="cost-item" data-cost="tools">
+            <div class="cost-icon tools-icon"></div>
+            <span class="cost-value">{{TOOLS_COST}}</span>
+        </div>
+         <!-- Placeholder for potential right-side elements if needed -->
+    </div>
+</div>
