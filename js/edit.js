@@ -112,11 +112,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Handlers ---
-    function handleSaveChangesClick() {
-        console.log("Current Card Data (In Memory):");
-        console.log(JSON.stringify(cardsData, null, 2)); // Pretty print the JSON
-        alert("Current card data logged to the browser console. Saving to file is not implemented.");
-        // In a real application, you would send this data to a server or offer a download.
+    async function handleSaveChangesClick() {
+        console.log("Attempting to save card data...");
+        try {
+            const response = await fetch('/save_cards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cardsData) // Send the entire cardsData object
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                alert("Cards saved successfully!");
+                console.log("Save successful:", result.message);
+            } else {
+                throw new Error(result.message || `Server responded with status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Error saving cards:", error);
+            alert(`Failed to save cards: ${error.message}`);
+        }
     }
 
     function handleAddCardClick() {
