@@ -43,8 +43,3 @@ This project provides a web-based editor for creating and modifying car stat car
 *   `requirements.txt`: Lists the Python dependencies required by the server (includes `Flask`, `Flask-Cors`, `python-dotenv`).
 *   `.gitignore`: Specifies intentionally untracked files that Git should ignore.
 *   `README.md`: This file.
-
-## Notes
-
-*   All edits (adding, removing, modifying cards) are currently stored **only in the browser's memory**. Changes will be lost when the page is closed or refreshed. The "Save Changes" button only logs the current data to the console.
-*   Editing the card name only changes the displayed text, not the underlying data key or the associated image filename due to complexity.
