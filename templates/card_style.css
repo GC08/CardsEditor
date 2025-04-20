@@ -102,13 +102,21 @@
 
 .stars {
     display: flex;
+    /* Removed cursor: pointer; - now on wrapper */
+}
+
+.star-wrapper {
+    display: inline-flex; /* Use inline-flex to keep stars in a row */
+    align-items: center;
+    justify-content: center;
+    margin-left: 3px; /* Apply spacing between wrappers */
     cursor: pointer; /* Indicate stars are clickable */
 }
 
 .star {
     width: 16px; /* Adjusted size */
     height: 16px;
-    margin-left: 3px;
+    /* margin-left: 3px; Removed - handled by wrapper */
     background-color: grey; /* Default empty star */
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); /* Basic star shape */
 }

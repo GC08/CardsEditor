@@ -107,7 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let starsHtml = '';
         const filledStars = Math.max(0, Math.min(5, rating)); // Clamp rating between 0 and 5
         for (let i = 1; i <= 5; i++) {
-            starsHtml += `<div class="star ${i <= filledStars ? 'filled' : ''}" data-value="${i}"></div>`;
+            // Wrap each star in a div for a larger click area
+            starsHtml += `<div class="star-wrapper"><div class="star ${i <= filledStars ? 'filled' : ''}" data-value="${i}"></div></div>`;
         }
         return starsHtml;
     }
@@ -189,14 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!cardName || !cardsData.cards[cardName]) return;
 
         // Handle Star Clicks
-        if (target.classList.contains('star') && target.parentElement.classList.contains('stars')) {
-            const statGroup = target.parentElement;
+        // Check if the click happened within a star-wrapper
+        const starWrapper = target.closest('.star-wrapper');
+        if (starWrapper && starWrapper.parentElement.classList.contains('stars')) {
+            const starElement = starWrapper.querySelector('.star'); // Find the actual star inside
+            if (!starElement) return; // Safety check
+
+            const statGroup = starWrapper.parentElement; // The '.stars' container
             const statName = statGroup.dataset.stat;
-            const newValue = parseInt(target.dataset.value, 10);
+            const newValue = parseInt(starElement.dataset.value, 10); // Get value from the star element
 
             if (statName && !isNaN(newValue)) {
                 cardsData.cards[cardName][statName] = newValue;
-                statGroup.innerHTML = generateStarsHTML(statName, newValue);
+                statGroup.innerHTML = generateStarsHTML(statName, newValue); // Regenerate the group's HTML
             }
         }
 
