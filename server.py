@@ -20,7 +20,7 @@ def editor():
 @app.route('/<path:filename>')
 def serve_static(filename):
     # Allow access to specific directories and files
-    allowed_dirs = ['css', 'js', 'templates', 'card_images']
+    allowed_dirs = ['css', 'js', 'templates', 'card_images', 'fonts']
     # Check if the requested path starts with an allowed directory or is cards.json
     if any(filename.startswith(dir + '/') for dir in allowed_dirs) or filename == 'cards.json':
          # Use safe_join to prevent directory traversal
