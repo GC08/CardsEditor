@@ -1,6 +1,7 @@
 import json
 import os
-from flask import Flask, request, send_from_directory, jsonify
+import urllib.parse # Import urllib
+from flask import Flask, request, send_from_directory, jsonify, send_file # Import send_file
 from flask_cors import CORS # Import CORS
 from dotenv import load_dotenv
 
@@ -51,24 +52,46 @@ def serve_static(filename):
 # Route to serve images specifically from the configured CARD_IMAGES_DIR
 @app.route('/external_image/<path:image_filename>')
 def serve_external_image(image_filename):
+    print(f"\n--- Request for image: {image_filename} ---")
+    print(f"Using CARD_IMAGES_DIR: {CARD_IMAGES_DIR}")
+
     # Basic security check: prevent directory traversal
     if '..' in image_filename or image_filename.startswith('/') or image_filename.startswith('\\'):
+        print(f"ERROR: Invalid filename pattern detected: {image_filename}")
         return "Invalid filename", 400
 
     try:
-        # Serve the file directly from the absolute CARD_IMAGES_DIR
-        # Ensure CARD_IMAGES_DIR is an absolute path for send_from_directory to work correctly here
-        if not os.path.isabs(CARD_IMAGES_DIR):
-             print(f"ERROR: CARD_IMAGES_DIR '{CARD_IMAGES_DIR}' is not an absolute path. Cannot serve external images securely.")
-             return "Server configuration error", 500
+        # Decode the filename received from the URL
+        decoded_filename = urllib.parse.unquote(image_filename)
+        print(f"Decoded filename: {decoded_filename}")
 
-        print(f"Attempting to serve image: {os.path.join(CARD_IMAGES_DIR, image_filename)}")
-        return send_from_directory(CARD_IMAGES_DIR, image_filename, as_attachment=False)
-    except FileNotFoundError:
-        print(f"Image not found: {os.path.join(CARD_IMAGES_DIR, image_filename)}")
-        return "Image not found", 404
+        # Construct the full absolute path to the image file
+        # Security Note: CARD_IMAGES_DIR comes from .env, decoded_filename had basic checks.
+        # Ensure the server process has read access to this path.
+        full_image_path = os.path.join(CARD_IMAGES_DIR, decoded_filename)
+        print(f"Constructed full path: {full_image_path}")
+
+        # Explicitly check existence and type before try block
+        exists = os.path.exists(full_image_path)
+        is_file = os.path.isfile(full_image_path)
+        print(f"Checking path - Exists: {exists}, Is File: {is_file}")
+
+        # Check if the constructed path is valid and exists
+        if not exists or not is_file:
+            print(f"Image not found or not a file at path: {full_image_path}")
+            return "Image not found", 404
+
+        print(f"Attempting to send file via send_file: {full_image_path}")
+        # Use send_file with the absolute path
+        return send_file(full_image_path, as_attachment=False)
+
     except Exception as e:
-        print(f"Error serving image {image_filename}: {e}")
+        # Log the specific exception type and message for debugging
+        exception_type = type(e).__name__
+        print(f"ERROR [{exception_type}] processing or sending image {image_filename} (decoded: {decoded_filename}): {e}")
+        # Also log the traceback for more details
+        import traceback
+        traceback.print_exc()
         return "Error serving image", 500
 
 # Route to save card data
