@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addCardBtn = document.getElementById('add-card-btn');
     const saveChangesBtn = document.getElementById('save-changes-btn'); // Get save button
     const printSelectedBtn = document.getElementById('print-selected-btn'); // Get print button
+    const selectAllCheckbox = document.getElementById('select-all-checkbox'); // Get select all checkbox
     let cardTemplateString = '';
     let cardsData = {}; // Will hold the parsed JSON { cards: { ... } }
 
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addCardBtn.addEventListener('click', handleAddCardClick);
         saveChangesBtn.addEventListener('click', handleSaveChangesClick); // Listener for save button
         printSelectedBtn.addEventListener('click', handlePrintSelectedClick); // Listener for print button
+        selectAllCheckbox.addEventListener('change', handleSelectAllChange); // Listener for select all checkbox
         cardContainer.addEventListener('click', handleCardContainerClick);
         cardContainer.addEventListener('contextmenu', handleCardContainerRightClick); // Listener for right-clicks (for decrement)
         cardContainer.addEventListener('dblclick', handleCardContainerDoubleClick); // Use double-click for editing text
@@ -222,8 +224,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('card-year')) {
             makeEditable(target, cardName, 'year');
         }
+
+        // Handle individual checkbox clicks to update "Select All" state
+        if (target.classList.contains('card-select-checkbox')) {
+            updateSelectAllCheckboxState();
+        }
     } // End of handleCardContainerClick
-    
+
+    function handleSelectAllChange() {
+        const isChecked = selectAllCheckbox.checked;
+        const cardCheckboxes = cardContainer.querySelectorAll('.card-select-checkbox');
+        cardCheckboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    }
+
+    // --- Helper to update the "Select All" checkbox based on individual card checkboxes ---
+    function updateSelectAllCheckboxState() {
+        const cardCheckboxes = cardContainer.querySelectorAll('.card-select-checkbox');
+        const totalCheckboxes = cardCheckboxes.length;
+        const checkedCheckboxes = cardContainer.querySelectorAll('.card-select-checkbox:checked').length;
+
+        if (totalCheckboxes === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false; // No cards, not indeterminate
+        } else if (checkedCheckboxes === totalCheckboxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCheckboxes > 0) {
+            selectAllCheckbox.checked = false; // Uncheck if not all are checked
+            selectAllCheckbox.indeterminate = true; // Show indeterminate state if some are checked
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+    }
+
+
      function handleCardContainerRightClick(event) {
         const target = event.target;
         const costItem = target.closest('.cost-item');
@@ -432,7 +469,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Start the application ---
-    init();
+    init().then(() => {
+        // Initial check for select all state after cards are loaded
+        updateSelectAllCheckboxState();
+    });
 
     // Adjust heights on window resize as well
     // window.addEventListener('resize', adjustCardHeights); // (Temporarily disabled for debugging)

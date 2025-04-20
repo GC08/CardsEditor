@@ -55,3 +55,19 @@ h1 {
 #save-changes-btn:hover {
     background-color: #2980b9;
 }
+/* Styles for the Print Selected button */
+#print-selected-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #888; /* Grey */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 10px; /* Add some space next to the Save button */
+}
+
+#print-selected-btn:hover {
+    background-color: #666;
+}
