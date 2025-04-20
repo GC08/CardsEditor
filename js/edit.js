@@ -6,11 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectAllCheckbox = document.getElementById('select-all-checkbox'); // Get select all checkbox
     let cardTemplateString = '';
     let cardsData = {}; // Will hold the parsed JSON { cards: { ... } }
+    // Removed cardImagesDir variable, path is now handled by server route
 
     // --- Initialization ---
     async function init() {
         try {
             // Stop any previous server first if needed (handled by user/script)
+            // Fetch template and card data
             const [templateResponse, dataResponse] = await Promise.all([
                 fetch('templates/card.html'),
                 fetch('cards.json')
@@ -58,8 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Basic replacements
         cardHtml = cardHtml.replace(/{{NAME}}/g, escapeHtml(name)); // Replace all instances of name, escape HTML
         cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
-        // Construct image path safely - Use absolute path for print view if needed, but relative should work if print.html is at root
-        const imagePath = `card_images/${encodeURIComponent(name)}.png`;
+        cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
+        // Construct image path using the server route for external images
+        const imagePath = `/external_image/${encodeURIComponent(name)}.png`;
         cardHtml = cardHtml.replace('{{IMAGE_SRC}}', imagePath);
 
         // Stats - Stars

@@ -2,6 +2,9 @@ import json
 import os
 from flask import Flask, request, send_from_directory, jsonify
 from flask_cors import CORS # Import CORS
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
 
 app = Flask(__name__, static_folder=None) # Disable default static handler
 CORS(app) # Enable CORS for all routes
@@ -10,33 +13,63 @@ CORS(app) # Enable CORS for all routes
 base_dir = os.path.dirname(os.path.abspath(__file__))
 cards_file_path = os.path.join(base_dir, 'cards.json')
 
+# Determine the card images directory from environment variable or default
+# IMPORTANT: This path MUST exist and be accessible by the server process.
+CARD_IMAGES_DIR = os.getenv('CARD_IMAGES_DIR', os.path.join(base_dir, 'card_images')) # Default to relative path if not set
+print(f"Attempting to use card images directory: {CARD_IMAGES_DIR}")
+if not os.path.isdir(CARD_IMAGES_DIR):
+     print(f"WARNING: Configured CARD_IMAGES_DIR '{CARD_IMAGES_DIR}' does not exist or is not a directory. Image loading might fail.")
+
+
 # Route to serve the main editor page
 @app.route('/')
 @app.route('/edit.html')
 def editor():
     return send_from_directory(base_dir, 'edit.html')
 
-# Route to serve static files (CSS, JS, Templates, Images)
+# Route to serve static files (CSS, JS, Templates) from the project directory
 @app.route('/<path:filename>')
 def serve_static(filename):
-    # Allow access to specific directories and files
-    allowed_dirs = ['css', 'js', 'templates', 'card_images', 'fonts']
+    # Allow access to specific directories and files relative to the project
+    allowed_dirs = ['css', 'js', 'templates', 'fonts']
     # Check if the requested path starts with an allowed directory or is cards.json
     if any(filename.startswith(dir + '/') for dir in allowed_dirs) or filename == 'cards.json':
-         # Use safe_join to prevent directory traversal
+         # Use safe_join to prevent directory traversal within the base_dir
         safe_path = os.path.join(base_dir, filename)
         if os.path.exists(safe_path):
-             # Determine the directory part of the filename
+             # Determine the directory part of the filename relative to base_dir
             directory = os.path.dirname(filename)
             file = os.path.basename(filename)
             # Serve templates from the templates directory specifically
             if directory == 'templates':
                  return send_from_directory(os.path.join(base_dir, 'templates'), file)
-            # Serve other allowed files/directories
+            # Serve other allowed files/directories from base_dir
             return send_from_directory(os.path.join(base_dir, directory), file)
-    # Return 404 if the file is not found or not allowed
+    # Return 404 if the file is not found or not allowed within base_dir
     return "File not found", 404
 
+# Route to serve images specifically from the configured CARD_IMAGES_DIR
+@app.route('/external_image/<path:image_filename>')
+def serve_external_image(image_filename):
+    # Basic security check: prevent directory traversal
+    if '..' in image_filename or image_filename.startswith('/') or image_filename.startswith('\\'):
+        return "Invalid filename", 400
+
+    try:
+        # Serve the file directly from the absolute CARD_IMAGES_DIR
+        # Ensure CARD_IMAGES_DIR is an absolute path for send_from_directory to work correctly here
+        if not os.path.isabs(CARD_IMAGES_DIR):
+             print(f"ERROR: CARD_IMAGES_DIR '{CARD_IMAGES_DIR}' is not an absolute path. Cannot serve external images securely.")
+             return "Server configuration error", 500
+
+        print(f"Attempting to serve image: {os.path.join(CARD_IMAGES_DIR, image_filename)}")
+        return send_from_directory(CARD_IMAGES_DIR, image_filename, as_attachment=False)
+    except FileNotFoundError:
+        print(f"Image not found: {os.path.join(CARD_IMAGES_DIR, image_filename)}")
+        return "Image not found", 404
+    except Exception as e:
+        print(f"Error serving image {image_filename}: {e}")
+        return "Error serving image", 500
 
 # Route to save card data
 @app.route('/save_cards', methods=['POST'])

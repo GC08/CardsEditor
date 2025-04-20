@@ -30,16 +30,17 @@ This project provides a web-based editor for creating and modifying car stat car
 
 *   `edit.html`: The main editor page.
 *   `cards.json`: Contains the data for the car cards.
-*   `card_images/`: Directory to store card images (e.g., `AC COBRA 289.png`). Image filenames must match the card name in `cards.json`.
+*   `.env`: Optional file to specify the `CARD_IMAGES_DIR`. This can be a relative path within the project (e.g., `card_images2`) or an absolute path on your system (e.g., `G:\MyCardImages`). If not present or the path is invalid, it defaults to `card_images/` relative to the project. The server must have read access to this directory.
+*   `card_images/`: Default directory to store card images (e.g., `AC COBRA 289.png`). Image filenames must match the card name in `cards.json`.
 *   `css/style.css`: Styles for the main `edit.html` page.
 *   `css/print.css`: Styles specifically for the print view.
 *   `js/edit.js`: JavaScript logic for loading data, rendering cards, and handling interactions.
 *   `templates/card.html`: HTML template for a single card.
 *   `templates/card_style.css`: CSS styles specifically for the card template.
-*   `server.py`: The Flask backend server script.
+*   `server.py`: The Flask backend server script. Handles serving the application and proxying image requests from the configured `CARD_IMAGES_DIR`.
 *   `install.bat`: Script to easily install Python dependencies.
 *   `start_server.bat`: Script to easily start the Flask server and open the editor.
-*   `requirements.txt`: Lists the Python dependencies required by the server.
+*   `requirements.txt`: Lists the Python dependencies required by the server (includes `Flask`, `Flask-Cors`, `python-dotenv`).
 *   `.gitignore`: Specifies intentionally untracked files that Git should ignore.
 *   `README.md`: This file.
 
