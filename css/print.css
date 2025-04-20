@@ -24,7 +24,7 @@
     /* Let card styles from card_style.css apply, only add print-specific behavior */
     .card-template {
         /* Set width for 3 columns */
-        width: 33.333%;
+        width: 63mm;
         box-sizing: border-box; /* Width includes border/padding */
 
         /* Remove card margin specifically for print */
@@ -32,7 +32,8 @@
 
         /* Scale down the card content using zoom to fit the 33.333% width */
         /* This scales the rendering without affecting layout box, preventing gaps */
-        zoom: 0.85; /* Adjust zoom factor as needed (e.g., 85%) */
+        height: 88mm;
+        zoom: 1; /* Remove zoom */
 
         page-break-inside: avoid; /* Try to prevent cards from breaking across pages */
 
