@@ -55,9 +55,10 @@
 
 .card-name {
     margin: 0;
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: bold;
     color: #cbc1ad;
+    height: 52px;
 }
 
 .card-image-container {
@@ -142,35 +143,34 @@
 }
 
 .cost-icon {
-    width: 30px; /* Adjust size */
-    height: 30px;
-    background-color: #d8c8a8; /* Beige background for icons */
-    border-radius: 50%; /* Make icons circular */
+    width: 40px; /* Increased size */
+    height: 40px; /* Increased size */
+    background-color: transparent; /* Remove background color */
+    border-radius: 0; /* Remove circular border */
     margin: 0 auto 5px auto;
-    background-size: 60%; /* Adjust icon size within circle */
+    background-size: contain; /* Ensure icon fits within bounds */
     background-repeat: no-repeat;
     background-position: center;
-    border: 1px solid #1a1a1a;
+    border: none; /* Remove border */
     cursor: pointer; /* Indicate clickable */
 }
 
-/* Placeholder background colors - replace with actual icons */
+/* Use background images for icons */
 .money-icon {
-    background-color: #cebe67;
+    background-image: url('../icons/money.png');
 }
 .gas-icon {
-    background-color: #b33737;
+    background-image: url('../icons/fuel.png');
 }
-.tires-icon { background-color: dimgray; /* Placeholder */ }
-.parts-icon { background-color: silver; /* Placeholder */ }
-.tools-icon { background-color: lightslategray; /* Placeholder */ }
-
-/* TODO: Add actual background-image URLs for icons */
-/*
-.money-icon { background-image: url('../path/to/money.svg'); }
-.gas-icon { background-image: url('../path/to/gas.svg'); }
-...etc
-*/
+.tires-icon {
+    background-image: url('../icons/tires.png');
+}
+.parts-icon {
+    background-image: url('../icons/parts.png');
+}
+.tools-icon {
+    background-image: url('../icons/tools.png');
+}
 
 .cost-value {
     display: block;

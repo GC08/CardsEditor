@@ -25,6 +25,7 @@ This project provides a web-based editor for creating and modifying car stat car
     *   Automatically open the editor (`edit.html`) in your default web browser at `http://localhost:8000/edit.html` (if using `start_server.bat`). If running manually, navigate to this URL.
 4.  **Use the Editor:** Interact with the cards as described in the Features section.
 5.  **Stop the Server:** Close the command prompt window that was opened by `start_server.bat` (or press `Ctrl+C` in the terminal where `server.py` is running).
+6.  **Update the Application:** Double-click the `update.bat` file (or run `git pull` in the terminal) to pull the latest changes from the Git repository.
 
 ## File Structure
 
