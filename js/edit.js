@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectAllCheckbox = document.getElementById('select-all-checkbox'); // Get select all checkbox
     let cardTemplateString = '';
     let cardsData = {}; // Will hold the parsed JSON { cards: { ... } }
+    let lastClickedCheckboxIndex = -1; // To track the last clicked checkbox for Shift+Click
     // Removed cardImagesDir variable, path is now handled by server route
 
     // --- Initialization ---
@@ -232,9 +233,23 @@ document.addEventListener('DOMContentLoaded', () => {
             makeEditable(target, cardName, 'year');
         }
 
-        // Handle individual checkbox clicks to update "Select All" state
+        // Handle individual checkbox clicks to update "Select All" state and implement Shift+Click
         if (target.classList.contains('card-select-checkbox')) {
-            updateSelectAllCheckboxState();
+            const currentCheckbox = target;
+            const cardCheckboxes = cardContainer.querySelectorAll('.card-select-checkbox');
+            const currentIndex = Array.from(cardCheckboxes).indexOf(currentCheckbox);
+
+            if (event.shiftKey && lastClickedCheckboxIndex !== -1) {
+                const start = Math.min(lastClickedCheckboxIndex, currentIndex);
+                const end = Math.max(lastClickedCheckboxIndex, currentIndex);
+
+                for (let i = start; i <= end; i++) {
+                    cardCheckboxes[i].checked = currentCheckbox.checked;
+                }
+            }
+
+            lastClickedCheckboxIndex = currentIndex; // Update last clicked index
+            updateSelectAllCheckboxState(); // Update "Select All" state after changes
         }
     } // End of handleCardContainerClick
 
