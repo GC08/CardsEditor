@@ -14,7 +14,11 @@ CORS(app) # Enable CORS for all routes
 base_dir = os.path.dirname(os.path.abspath(__file__))
 # Determine the cards collection filename from environment variable or default
 cars_file_name = os.getenv('CARS_COLLECTION_FILE', 'cards.json') # Default to 'cards.json' if not set
-cards_file_path = os.path.join(base_dir, cars_file_name)
+# Check if cars_file_name is an absolute path
+if os.path.isabs(cars_file_name):
+    cards_file_path = cars_file_name
+else:
+    cards_file_path = os.path.join(base_dir, cars_file_name)
 print(f"Using cards collection file: {cards_file_path}") # Add print statement for confirmation
 
 # Determine the card images directory from environment variable or default
@@ -37,7 +41,7 @@ def serve_static(filename):
     # Allow access to specific directories and files relative to the project
     allowed_dirs = ['css', 'js', 'templates', 'fonts', 'icons'] # Added 'icons'
     # Check if the requested path starts with an allowed directory OR is the configured cards file
-    if any(filename.startswith(dir + '/') for dir in allowed_dirs) or filename == cars_file_name: # Use the variable here
+    if any(filename.startswith(dir + '/') for dir in allowed_dirs): # Removed check for cars_file_name
         # Use safe_join to prevent directory traversal within the base_dir
         safe_path = os.path.join(base_dir, filename)
         if os.path.exists(safe_path):
@@ -51,6 +55,23 @@ def serve_static(filename):
             return send_from_directory(os.path.join(base_dir, directory), file)
     # Return 404 if the file is not found or not allowed within base_dir
     return "File not found", 404
+
+# Route to serve the cards data specifically
+@app.route('/get_cards')
+def get_cards_data():
+    try:
+        # Check if the determined cards file path exists
+        if not os.path.exists(cards_file_path) or not os.path.isfile(cards_file_path):
+            print(f"ERROR: Cards data file not found at: {cards_file_path}")
+            return jsonify({"error": "Card data file not found on server."}), 404
+
+        # Use send_file to send the JSON data
+        # Setting mimetype explicitly might be necessary depending on browser behavior
+        return send_file(cards_file_path, mimetype='application/json')
+
+    except Exception as e:
+        print(f"ERROR serving cards data from {cards_file_path}: {e}")
+        return jsonify({"error": "Error serving card data."}), 500
 
 # Route to serve images specifically from the configured CARD_IMAGES_DIR
 @app.route('/external_image/<path:image_filename>')

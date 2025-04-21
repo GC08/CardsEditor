@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fetch template and card data
             const [templateResponse, dataResponse] = await Promise.all([
                 fetch('templates/card.html'),
-                fetch('cards.json')
+                fetch('/get_cards') // Changed endpoint
             ]);
 
             if (!templateResponse.ok) throw new Error(`Failed to fetch template: ${templateResponse.statusText}`);
