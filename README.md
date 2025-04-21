@@ -31,8 +31,10 @@ This project provides a web-based editor for creating and modifying car stat car
 
 *   `edit.html`: The main editor page.
 *   `cards.json`: Contains the data for the car cards.
-*   `.env`: Optional file to specify the `CARD_IMAGES_DIR`. This can be a relative path within the project (e.g., `card_images2`) or an absolute path on your system (e.g., `G:\MyCardImages`). If not present or the path is invalid, it defaults to `card_images/` relative to the project. The server must have read access to this directory.
-*   `card_images/`: Default directory to store card images (e.g., `AC COBRA 289.png`). Image filenames must match the card name in `cards.json`.
+*   `.env`: Optional file to specify environment variables:
+    *   `CARD_IMAGES_DIR`: Path to the directory containing card images. This can be a relative path within the project (e.g., `card_images2`) or an absolute path on your system (e.g., `G:\MyCardImages`). If not present or the path is invalid, it defaults to `card_images/` relative to the project. The server must have read access to this directory.
+    *   `CARS_COLLECTION_FILE`: The filename for the JSON file containing car data (e.g., `my_cars.json`). If not present, it defaults to `cards.json` in the project root.
+*   `card_images/`: Default directory to store card images (e.g., `AC COBRA 289.png`). Image filenames must match the card name in the JSON data file.
 *   `css/style.css`: Styles for the main `edit.html` page.
 *   `css/print.css`: Styles specifically for the print view.
 *   `js/edit.js`: JavaScript logic for loading data, rendering cards, and handling interactions.

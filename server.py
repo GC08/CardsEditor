@@ -12,7 +12,10 @@ CORS(app) # Enable CORS for all routes
 
 # Get the directory where the script is located
 base_dir = os.path.dirname(os.path.abspath(__file__))
-cards_file_path = os.path.join(base_dir, 'cards.json')
+# Determine the cards collection filename from environment variable or default
+cars_file_name = os.getenv('CARS_COLLECTION_FILE', 'cards.json') # Default to 'cards.json' if not set
+cards_file_path = os.path.join(base_dir, cars_file_name)
+print(f"Using cards collection file: {cards_file_path}") # Add print statement for confirmation
 
 # Determine the card images directory from environment variable or default
 # IMPORTANT: This path MUST exist and be accessible by the server process.
@@ -33,18 +36,18 @@ def editor():
 def serve_static(filename):
     # Allow access to specific directories and files relative to the project
     allowed_dirs = ['css', 'js', 'templates', 'fonts', 'icons'] # Added 'icons'
-    # Check if the requested path starts with an allowed directory or is cards.json
-    if any(filename.startswith(dir + '/') for dir in allowed_dirs) or filename == 'cards.json':
-         # Use safe_join to prevent directory traversal within the base_dir
+    # Check if the requested path starts with an allowed directory OR is the configured cards file
+    if any(filename.startswith(dir + '/') for dir in allowed_dirs) or filename == cars_file_name: # Use the variable here
+        # Use safe_join to prevent directory traversal within the base_dir
         safe_path = os.path.join(base_dir, filename)
         if os.path.exists(safe_path):
-             # Determine the directory part of the filename relative to base_dir
+            # Determine the directory part of the filename relative to base_dir
             directory = os.path.dirname(filename)
             file = os.path.basename(filename)
             # Serve templates from the templates directory specifically
             if directory == 'templates':
                  return send_from_directory(os.path.join(base_dir, 'templates'), file)
-            # Serve other allowed files/directories from base_dir
+            # Serve the cards JSON file or other allowed files from base_dir or subdirs
             return send_from_directory(os.path.join(base_dir, directory), file)
     # Return 404 if the file is not found or not allowed within base_dir
     return "File not found", 404
