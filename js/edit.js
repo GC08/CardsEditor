@@ -63,7 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
         cardHtml = cardHtml.replace('{{YEAR}}', escapeHtml(details.year || 'N/A'));
         // Construct image path using the server route for external images
-        const imagePath = `/external_image/${encodeURIComponent(name)}.png`;
+        // Use the 'image' property if available, otherwise fall back to the old naming convention
+        const imageFilename = details.image ? details.image : `${encodeURIComponent(name)}.png`;
+        const imagePath = `/external_image/${imageFilename}`;
         cardHtml = cardHtml.replace('{{IMAGE_SRC}}', imagePath);
 
         // Stats - Stars
