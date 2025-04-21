@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cardHtml = cardHtml.replace('{{MONEY_COST}}', details.money || 0);
         cardHtml = cardHtml.replace('{{GAS_COST}}', details.gas || 0);
         cardHtml = cardHtml.replace('{{TIRES_COST}}', details.tires || 0);
-        cardHtml = cardHtml.replace('{{PARTS_COST}}', details.parts || 0);
         cardHtml = cardHtml.replace('{{TOOLS_COST}}', details.tools || 0);
 
         return cardHtml.trim();
@@ -171,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
             money: 1,
             gas: 1,
             tires: 1,
-            parts: 1,
             tools: 1
         };
 

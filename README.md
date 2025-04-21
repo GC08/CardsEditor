@@ -9,7 +9,7 @@ This project provides a web-based editor for creating and modifying car stat car
 *   Allows adding new cards with default values (data stored in browser memory only).
 *   Allows removing cards (data removed from browser memory only).
 *   Supports editing stats (Speed, Acceleration, Handling) by clicking stars.
-*   Supports editing costs (Money, Gas, Tires, Parts, Tools) by left-clicking (increment) or right-clicking (decrement).
+*   Supports editing costs (Money, Gas, Tires, Tools) by left-clicking (increment) or right-clicking (decrement).
 *   Supports editing Year by clicking on it.
 *   Supports editing Name by double-clicking (Name edit is display-only).
 *   Allows selecting cards via checkboxes for printing.

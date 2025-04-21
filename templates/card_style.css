@@ -11,7 +11,7 @@
     letter-spacing: 1px;
     background-color: #beb194;
     color: #e0e0e0;
-    border: 9px solid #beb194;
+    border: 1px solid #000000;
     border-radius: 31px;
     width: 220px;
     display: inline-block;
@@ -20,8 +20,8 @@
     overflow: hidden;
     border-spacing: 0;
     position: relative;
-    padding: 0;
     height: 315px;
+    padding: 9px;
 }
 
 .card-header {
@@ -162,9 +162,6 @@
 }
 .tires-icon {
     background-image: url('../icons/tires.png');
-}
-.parts-icon {
-    background-image: url('../icons/parts.png');
 }
 .tools-icon {
     background-image: url('../icons/tools.png');
